@@ -20,10 +20,7 @@ def main(argv):
 			str1 = base64.decodestring(str1)
 	except:
 		counter = counter + 1
-		if (counter == 1):
-			print "String \"" + str1 + "\" is not Bas64 encoded."
-		else:
-			print str(counter)+':',str1
+		print str(counter)+':',str1
 
 
 if __name__ == "__main__":
