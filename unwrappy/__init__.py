@@ -11,6 +11,7 @@ Has a few functions
 
 from sys import version_info
 
+
 def prep_string(s):
     """
     Due to Python2/3 differences string conversion is different
@@ -22,7 +23,7 @@ def clean_string(s):
     """
     Same reasoning as prep_string
     """
-    S =  s if version_info.major != 3 else s.decode("utf-8")
+    S = s if version_info.major != 3 else s.decode("utf-8")
     return S.strip().strip("\n")
 
 
@@ -33,12 +34,34 @@ def unwrap_strings(strings=[], debug=False):
     Unwraps them all sequentially
     """
     unwrapped = list()
+    if debug:
+        print("Length of input: {0}".format(len(strings)))
+        print("Starting unwrap")
     for s in strings:
         try:
-            unwrapped.append([s, DS(prep_string(s))])
+            unwrapped.append([s, unwrap_complete(s, debug)])
         except Exception as e:
             print("ERROR: {0}".format(e))
     return unwrapped 
+
+def unwrap_complete(string, debug=False):
+    """
+    Unwrap until it can't be unwrapped anymore!
+    """
+    counter = 0
+    unwrapped = False
+    if debug:
+        print("Unwrap loop started on string {0}".format(string))
+    try:
+        while DS(prep_string(string)):
+            counter += 1
+            string = DS(prep_string(string))
+            if debug:
+                print("Cycle {0} -> {1}".format(counter, string))
+    except:
+        if counter == 0:
+            raise ValueError("String is not Base64 encoded!")
+    return string
 
 
 def print_unwrapped(pairs=[], debug=False):
@@ -61,6 +84,9 @@ def main(*args, **kwargs):
     ap.add_argument("-d", action="store_const", default=False, const=True)
 
     args = ap.parse_args()
-    print_unwrapped(unwrap_strings(args.strings, args.d))
+    try:
+        print_unwrapped(unwrap_strings(args.strings, args.d), args.d)
+    except Exception as e:
+        print("Error: {0}".format(e))
 
 # end
